@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -22,16 +23,21 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        menuSel = R.id.nav_trips;
 
         mDrawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawer.addDrawerListener(drawerToggle);
         drawerToggle = setupDrawerToggle();
         nvDrawer = (NavigationView) findViewById(R.id.nvView);
         setupDrawerContent(nvDrawer);
+
+        if (savedInstanceState == null) {
+            menuSel = R.id.nav_trips;
+            FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+            transaction.add(R.id.content, new TripsFragment());
+            transaction.commit();
+        }
     }
 
     @Override
@@ -57,39 +63,67 @@ public class MainActivity extends AppCompatActivity {
 
     public void selectDrawerItem(MenuItem menuItem) {
         int selection = menuItem.getItemId();
+        FragmentTransaction transaction;
         Intent intent;
 
         switch(selection) {
             case R.id.nav_trips:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_trips) {
+                    menuSel = R.id.nav_trips;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new TripsFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_routes:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_routes) {
+                    menuSel = R.id.nav_routes;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new RoutesFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_bookmarks:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_bookmarks) {
+                    menuSel = R.id.nav_bookmarks;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new BookmarksFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_planner:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_feedback) {
+                    menuSel = R.id.nav_feedback;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new PlannerFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_timetables:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_timetables) {
+                    menuSel = R.id.nav_timetables;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new TimetablesFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_map:
-                //vpPager.setCurrentItem(selection);
+                if (menuSel != R.id.nav_map) {
+                    menuSel = R.id.nav_map;
+                    transaction = getSupportFragmentManager().beginTransaction();
+                    transaction.replace(R.id.content, new MapFragment());
+                    transaction.commit();
+                }
                 break;
             case R.id.nav_settings:
-                //menuSel = vpPager.getCurrentItem();
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
             case R.id.nav_feedback:
-                //menuSel = vpPager.getCurrentItem();
                 intent = new Intent(this, FeedbackActivity.class);
                 startActivity(intent);
                 break;
             case R.id.nav_help:
-                //menuSel = vpPager.getCurrentItem();
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
