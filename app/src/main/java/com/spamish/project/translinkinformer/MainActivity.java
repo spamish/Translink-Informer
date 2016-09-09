@@ -124,7 +124,7 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
                 break;
             case R.id.nav_help:
-                intent = new Intent(this, SettingsActivity.class);
+                intent = new Intent(this, HelpActivity.class);
                 startActivity(intent);
                 break;
             default:

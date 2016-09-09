@@ -2,51 +2,138 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.spamish.project.translinkinformer.TripsFragment">
+    tools:context="com.spamish.project.translinkinformer.PlannerFragment">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Start" />
-    <EditText
-        android:id="@+id/et_start"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent">
-    </EditText>
+        android:layout_height="match_parent">
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Start" />
+            <EditText
+                android:id="@+id/in_start"
+                android:singleLine="true"
+                android:hint="Starting location"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+            </EditText>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="End" />
-    <EditText
-        android:id="@+id/et_end"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent">
-    </EditText>
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Destination" />
+            <EditText
+                android:id="@+id/in_destination"
+                android:singleLine="true"
+                android:hint="Destination location"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent">
+            </EditText>
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Travel Day and Time" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Travel Day and Time" />
+            <Spinner
+                android:id="@+id/arrivalPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/array_arrivals" />
+            <Button
+                android:id="@+id/datePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Date Details" />
+            <Button
+                android:id="@+id/timePicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Time Details" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Modes of Transport" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Modes of Transport" />
+            <CheckBox android:id="@+id/in_mode_bus"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Bus" />
+            <CheckBox android:id="@+id/in_mode_train"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Train" />
+            <CheckBox android:id="@+id/in_mode_ferry"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ferry" />
+            <CheckBox android:id="@+id/in_mode_tram"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Tram" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Walking Options" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Walking Options" />
+            <Spinner
+                android:id="@+id/walkingPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/array_walking" />
+            <Spinner
+                android:id="@+id/speedPicker"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:entries="@array/array_speed" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Service Types" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Service Types" />
+            <CheckBox android:id="@+id/in_type_regular"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Regular" />
+            <CheckBox android:id="@+id/in_type_express"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Express" />
+            <CheckBox android:id="@+id/in_type_nightlink"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Nightlink" />
+            <CheckBox android:id="@+id/in_type_school"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="School" />
 
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Fare Types" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Fare Types" />
+            <CheckBox android:id="@+id/in_fare_standard"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Standard" />
+            <CheckBox android:id="@+id/in_fare_prepaid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Prepaid" />
+            <CheckBox android:id="@+id/in_fare_free"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Free" />
 
+            <Button
+                android:id="@+id/submit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Find Journey" />
+        </LinearLayout>
+    </ScrollView>
 </FrameLayout>
