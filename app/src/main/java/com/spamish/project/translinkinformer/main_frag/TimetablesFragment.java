@@ -1,4 +1,4 @@
-package com.spamish.project.translinkinformer;
+package com.spamish.project.translinkinformer.main_frag;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,9 +6,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-public class TripsFragment extends Fragment {
+import com.spamish.project.translinkinformer.R;
 
-    public TripsFragment() {
+public class TimetablesFragment extends Fragment {
+
+    public TimetablesFragment() {
         // Required empty public constructor
     }
 
@@ -20,8 +22,7 @@ public class TripsFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trips, container, false);
+        return inflater.inflate(R.layout.fragment_timetables, container, false);
     }
 
     @Override

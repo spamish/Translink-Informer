@@ -2,11 +2,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.spamish.project.translinkinformer.TripsFragment">
+    tools:context=".main_frag.TripsFragment">
 
-    <TextView
+    <AutoCompleteTextView
+        android:id="@+id/in_loc"
+        android:hint="Location of Interest"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello Map Fragment" />
+        android:layout_height="wrap_content">
+    </AutoCompleteTextView>
 
 </FrameLayout>
