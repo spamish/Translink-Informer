@@ -23,21 +23,22 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.spamish.project.translinkinformer.R;
 import com.spamish.project.translinkinformer.models.Suggested;
+import com.spamish.project.translinkinformer.models.Suggestion;
 import com.spamish.project.translinkinformer.opia.LocationAPI;
 import com.spamish.project.translinkinformer.opia.OpiaService;
 
 public class PlannerFragment extends Fragment {
     int pickYear, pickMonth, pickDay, pickHour, pickMin;
-    boolean startRes, destRes;
-    String startVal, destVal;
+    Suggestion startVal, destVal;
     Button time, date;
     Subscription subscription;
+    AutoCompleteTextView startText;
+    AutoCompleteTextView destText;
 
     public PlannerFragment() {
         // Required empty public constructor
@@ -52,6 +53,8 @@ public class PlannerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View viewer = inflater.inflate(R.layout.fragment_planner, container, false);
+        startText = (AutoCompleteTextView) viewer.findViewById(R.id.in_start);
+        destText = (AutoCompleteTextView) viewer.findViewById(R.id.in_destination);
 
         final CheckBox modeBus = (CheckBox) viewer.findViewById(R.id.in_mode_bus);
         final CheckBox modeTrain = (CheckBox) viewer.findViewById(R.id.in_mode_train);
@@ -91,13 +94,12 @@ public class PlannerFragment extends Fragment {
         setupSubmitButton(submit, modeBus, modeTrain, modeFerry, modeTram,
                 typeReg, typeExp, typeNig, typeSch, fareStd,
                 farePre, fareFre, walking, arrival, speed);
-        setupLocationChecker(viewer);
+        setupLocationChecker();
         setupSpinnerSelection(viewer);
         setupTime();
-        // False if location is resolved.
-        startRes = true;
-        destRes = true;
 
+        startVal = new Suggestion(null, null, 0);
+        destVal = new Suggestion(null, null, 0);
         return viewer;
     }
 
@@ -120,34 +122,37 @@ public class PlannerFragment extends Fragment {
                 int arrVal = arrival.getSelectedItemPosition();
                 int speeVal = speed.getSelectedItemPosition();
 
-                //2016-09-09T13:05:00
-                String dateTimeVal = new StringBuilder(
-                        pickYear + "-" +
-                                String.format("%02d", pickMonth + 1) + "-" +
-                                String.format("%02d", pickDay) + "T" +
-                                String.format("%02d", pickHour) + ":" +
-                                String.format("%02d", pickMin) + ":00"
-                ).toString();
+                if (checkLocations()) {
+                    //2016-09-09T13:05:00
+                    String dateTimeVal = new StringBuilder(
+                            pickYear + "-" +
+                                    String.format("%02d", pickMonth + 1) + "-" +
+                                    String.format("%02d", pickDay) + "T" +
+                                    String.format("%02d", pickHour) + ":" +
+                                    String.format("%02d", pickMin) + ":00"
+                    ).toString();
 
-                StringBuilder text = new StringBuilder(
-                        "Start: " + startVal + "\n" +
-                                "Dest: " + destVal + "\n" +
-                                "Arrival: " + arrVal + "\n" +
-                                "Time: " + dateTimeVal + "\n" +
-                                "Vehicles: " + modeVal + "\n" +
-                                "Speed: " + speeVal + "\n" +
-                                "Walking: " + walkVal + "\n" +
-                                "Service: " + typeVal + "\n" +
-                                "Fare: " + fareVal
-                );
-                Toaster.toast(text.toString());
+                    StringBuilder text = new StringBuilder(
+                            "Start: " + startVal.getId() + "\n" +
+                                    "Dest: " + destVal.getId() + "\n" +
+                                    "Arrival: " + arrVal + "\n" +
+                                    "Time: " + dateTimeVal + "\n" +
+                                    "Vehicles: " + modeVal + "\n" +
+                                    "Speed: " + speeVal + "\n" +
+                                    "Walking: " + walkVal + "\n" +
+                                    "Service: " + typeVal + "\n" +
+                                    "Fare: " + fareVal
+                    );
+
+                    Toaster.toast(text.toString());
+                } else {
+                    Toaster.toast("Please check the locations entered.");
+                }
             }
         });
     }
 
-    private void setupLocationChecker(View v) {
-        final AutoCompleteTextView startText = (AutoCompleteTextView) v.findViewById(R.id.in_start);
-        final AutoCompleteTextView destText = (AutoCompleteTextView) v.findViewById(R.id.in_destination);
+    private void setupLocationChecker() {
 
         startText.addTextChangedListener(new TextWatcher() {
             private Timer startTime = new Timer();
@@ -157,16 +162,14 @@ public class PlannerFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (startRes) {
-                    startTime.cancel();
-                    startTime = new Timer();
-                    startTime.schedule(new TimerTask() {
+                startTime.cancel();
+                startTime = new Timer();
+                startTime.schedule(new TimerTask() {
                         @Override
                         public void run() {
-                            resolveLocation(startText);
+                            resolveStartLocation();
                         }
-                    },1000);
-                }
+                },1000);
             }
         });
 
@@ -178,51 +181,73 @@ public class PlannerFragment extends Fragment {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (destRes) {
-                    destTime.cancel();
-                    destTime = new Timer();
-                    destTime.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            resolveLocation(destText);
-                        }
-                    },1000);
-                }
+                destTime.cancel();
+                destTime = new Timer();
+                destTime.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        resolveDestLocation();
+                    }
+                },1000);
             }
         });
     }
 
-    private void resolveLocation(final EditText text) {
-        String value = text.getText().toString();
+    private void resolveStartLocation() {
         final LocationAPI service = OpiaService.createLocationClient();
 
-        subscription = service.getSuggest(value, "0", 5)
-                .subscribeOn(Schedulers.newThread())
+        subscription = service.getSuggest(startText.getText().toString(), "0", 5)
+                .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(observable);
+                .subscribe(new Observer<Suggested>() {
+                    @Override
+                    public void onCompleted() {
+                        subscription.unsubscribe();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toaster.toast(e.getMessage());
+                    }
+
+                    @Override
+                    public void onNext(Suggested response) {
+                        String desc = response.getSuggestions().get(0).getDescription();
+                        String id = response.getSuggestions().get(0).getId();
+                        Toaster.toast(desc);
+                        startVal.setDescription(desc);
+                        startVal.setId(id);
+                    }
+                });
     }
 
-    Observer<Suggested> observable = new Observer<Suggested>() {
+    private void resolveDestLocation() {
+        final LocationAPI service = OpiaService.createLocationClient();
 
-        @Override
-        public void onCompleted() {
-            subscription.unsubscribe();
-        }
+        subscription = service.getSuggest(destText.getText().toString(), "0", 5)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Suggested>() {
+                    @Override
+                    public void onCompleted() {
+                        subscription.unsubscribe();
+                    }
 
-        @Override
-        public void onError(Throwable e) {
-            Toaster.toast(e.getMessage());
-        }
+                    @Override
+                    public void onError(Throwable e) {
+                        Toaster.toast(e.getMessage());
+                    }
 
-        @Override
-        public void onNext(Suggested suggestions) {
-            Toaster.toast(suggestions.getSuggestions().get(0).getDescription()
-                    + "\n" + suggestions.getSuggestions().get(1).getDescription()
-                    + "\n" + suggestions.getSuggestions().get(2).getDescription()
-                    + "\n" + suggestions.getSuggestions().get(3).getDescription()
-                    + "\n" + suggestions.getSuggestions().get(4).getDescription());
-        }
-    };
+                    @Override
+                    public void onNext(Suggested response) {
+                        String desc = response.getSuggestions().get(0).getDescription();
+                        String id = response.getSuggestions().get(0).getId();
+                        Toaster.toast(desc);
+                        destVal.setDescription(desc);
+                        destVal.setId(id);
+                    }
+                });
+    }
 
     private void setupSpinnerSelection(View v) {
         Spinner arrival = (Spinner) v.findViewById(R.id.arrivalPicker);
@@ -244,6 +269,22 @@ public class PlannerFragment extends Fragment {
 
         updateTime(pickHour, pickMin);
         updateDate(pickYear, pickMonth, pickDay);
+    }
+
+    private boolean checkLocations() {
+        String startDesc = startVal.getDescription();
+        String startCheck = startText.getText().toString();
+        String destDesc = destVal.getDescription();
+        String destCheck = destText.getText().toString();
+        boolean result = true;
+
+        if (!startDesc.equals(startCheck)) {
+            result = false;
+        }
+        if (!destDesc.equals(destCheck)) {
+            result = false;
+        }
+        return result;
     }
 
     private int findModes(CheckBox bus, CheckBox train, CheckBox ferry, CheckBox tram) {
