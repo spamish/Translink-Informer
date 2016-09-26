@@ -30,7 +30,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
                 <AutoCompleteTextView
-                    android:id="@+id/in_destination"
+                    android:id="@+id/in_dest"
                     android:singleLine="true"
                     android:hint="Destination location"
                     android:layout_width="match_parent"
@@ -47,102 +47,133 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:entries="@array/array_arrivals" />
-            <Button
-                android:id="@+id/datePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Date Details" />
-            <Button
-                android:id="@+id/timePicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Time Details" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <Button
+                        android:id="@+id/datePicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Date Details" />
+                    <Button
+                        android:id="@+id/timePicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Time Details" />
+                </TableRow>
+            </TableLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Modes of Transport" />
-            <CheckBox android:id="@+id/in_mode_bus"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Bus" />
-            <CheckBox android:id="@+id/in_mode_train"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Train" />
-            <CheckBox android:id="@+id/in_mode_ferry"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Ferry" />
-            <CheckBox android:id="@+id/in_mode_tram"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Tram" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <CheckBox android:id="@+id/in_mode_bus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Bus" />
+                    <CheckBox android:id="@+id/in_mode_train"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Train" />
+                    <CheckBox android:id="@+id/in_mode_ferry"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Ferry" />
+                    <CheckBox android:id="@+id/in_mode_tram"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Tram" />
+                </TableRow>
+            </TableLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Walking Options" />
-            <Spinner
-                android:id="@+id/walkingPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/array_walking" />
-            <Spinner
-                android:id="@+id/speedPicker"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:entries="@array/array_speed" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <Spinner
+                        android:id="@+id/walkingPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/array_walking" />
+
+                    <Spinner
+                        android:id="@+id/speedPicker"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:entries="@array/array_speed" />
+                </TableRow>
+            </TableLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Service Types" />
-            <CheckBox android:id="@+id/in_type_regular"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Regular" />
-            <CheckBox android:id="@+id/in_type_express"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Express" />
-            <CheckBox android:id="@+id/in_type_nightlink"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Nightlink" />
-            <CheckBox android:id="@+id/in_type_school"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="School" />
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <CheckBox android:id="@+id/in_type_regular"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Regular" />
+                    <CheckBox android:id="@+id/in_type_express"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Express" />
+                    <CheckBox android:id="@+id/in_type_nightlink"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Nightlink" />
+                    <CheckBox android:id="@+id/in_type_school"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="School" />
+                </TableRow>
+            </TableLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Fare Types" />
-            <CheckBox android:id="@+id/in_fare_standard"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Standard" />
-            <CheckBox android:id="@+id/in_fare_prepaid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Prepaid" />
-            <CheckBox android:id="@+id/in_fare_free"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:checked="true"
-                android:text="Free" />
-
+            <TableLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+                <TableRow>
+                    <CheckBox android:id="@+id/in_fare_standard"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Standard" />
+                    <CheckBox android:id="@+id/in_fare_prepaid"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Prepaid" />
+                    <CheckBox android:id="@+id/in_fare_free"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true"
+                        android:text="Free" />
+                </TableRow>
+            </TableLayout>
+            
             <Button
                 android:id="@+id/submit"
                 android:layout_width="wrap_content"

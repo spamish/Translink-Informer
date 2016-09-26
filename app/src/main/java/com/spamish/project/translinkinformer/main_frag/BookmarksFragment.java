@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.spamish.project.translinkinformer.R;
 
 public class BookmarksFragment extends Fragment {
+    private static final String TAG = "BookmarksFragment";
 
     public BookmarksFragment() {
         // Required empty public constructor

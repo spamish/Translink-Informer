@@ -1,25 +1,16 @@
 package com.spamish.project.translinkinformer.main_frag;
 
 import java.util.Calendar;
-import java.util.Timer;
-import java.util.TimerTask;
 
-import rx.Observer;
-import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
 import xdroid.toaster.Toaster;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -27,18 +18,16 @@ import android.widget.Spinner;
 import android.widget.TimePicker;
 
 import com.spamish.project.translinkinformer.R;
-import com.spamish.project.translinkinformer.models.Suggested;
+import com.spamish.project.translinkinformer.misc.LocationTextInput;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.opia.LocationAPI;
-import com.spamish.project.translinkinformer.opia.OpiaService;
 
 public class PlannerFragment extends Fragment {
+    private static final String TAG = "PlannerFragment";
     int pickYear, pickMonth, pickDay, pickHour, pickMin;
     Suggestion startVal, destVal;
     Button time, date;
-    Subscription subscription;
-    AutoCompleteTextView startText;
-    AutoCompleteTextView destText;
+    LocationTextInput startText;
+    LocationTextInput destText;
 
     public PlannerFragment() {
         // Required empty public constructor
@@ -53,8 +42,6 @@ public class PlannerFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View viewer = inflater.inflate(R.layout.fragment_planner, container, false);
-        startText = (AutoCompleteTextView) viewer.findViewById(R.id.in_start);
-        destText = (AutoCompleteTextView) viewer.findViewById(R.id.in_destination);
 
         final CheckBox modeBus = (CheckBox) viewer.findViewById(R.id.in_mode_bus);
         final CheckBox modeTrain = (CheckBox) viewer.findViewById(R.id.in_mode_train);
@@ -94,12 +81,22 @@ public class PlannerFragment extends Fragment {
         setupSubmitButton(submit, modeBus, modeTrain, modeFerry, modeTram,
                 typeReg, typeExp, typeNig, typeSch, fareStd,
                 farePre, fareFre, walking, arrival, speed);
-        setupLocationChecker();
+
+        startText = new LocationTextInput(getActivity(), viewer,
+                R.id.in_start, R.layout.list_loc_start, R.id.startTextViewItem);
+        destText = new LocationTextInput(getActivity(), viewer,
+                R.id.in_dest, R.layout.list_loc_dest, R.id.destTextViewItem);
+
         setupSpinnerSelection(viewer);
         setupTime();
 
-        startVal = new Suggestion(null, null, 0);
-        destVal = new Suggestion(null, null, 0);
+        startVal = new Suggestion();
+        startVal.setDescription("null");
+        startVal.setId("null");
+        destVal = new Suggestion();
+        destVal.setDescription("null");
+        destVal.setId("null");
+
         return viewer;
     }
 
@@ -122,131 +119,33 @@ public class PlannerFragment extends Fragment {
                 int arrVal = arrival.getSelectedItemPosition();
                 int speeVal = speed.getSelectedItemPosition();
 
+                startVal = startText.getValue();
+                destVal = destText.getValue();
+
                 if (checkLocations()) {
                     //2016-09-09T13:05:00
-                    String dateTimeVal = new StringBuilder(
-                            pickYear + "-" +
-                                    String.format("%02d", pickMonth + 1) + "-" +
-                                    String.format("%02d", pickDay) + "T" +
-                                    String.format("%02d", pickHour) + ":" +
-                                    String.format("%02d", pickMin) + ":00"
-                    ).toString();
+                    String dateTimeVal = pickYear + "-" +
+                            String.format("%02d", pickMonth + 1) + "-" +
+                            String.format("%02d", pickDay) + "T" +
+                            String.format("%02d", pickHour) + ":" +
+                            String.format("%02d", pickMin) + ":00";
 
-                    StringBuilder text = new StringBuilder(
-                            "Start: " + startVal.getId() + "\n" +
-                                    "Dest: " + destVal.getId() + "\n" +
-                                    "Arrival: " + arrVal + "\n" +
-                                    "Time: " + dateTimeVal + "\n" +
-                                    "Vehicles: " + modeVal + "\n" +
-                                    "Speed: " + speeVal + "\n" +
-                                    "Walking: " + walkVal + "\n" +
-                                    "Service: " + typeVal + "\n" +
-                                    "Fare: " + fareVal
-                    );
+                    String text = "Start: " + startVal.getId() + "\n" +
+                                  "Dest: " + destVal.getId() + "\n" +
+                                  "Arrival: " + arrVal + "\n" +
+                                  "Time: " + dateTimeVal + "\n" +
+                                  "Vehicles: " + modeVal + "\n" +
+                                  "Speed: " + speeVal + "\n" +
+                                  "Walking: " + walkVal + "\n" +
+                                  "Service: " + typeVal + "\n" +
+                                  "Fare: " + fareVal;
 
-                    Toaster.toast(text.toString());
+                    Toaster.toast(text);
                 } else {
                     Toaster.toast("Please check the locations entered.");
                 }
             }
         });
-    }
-
-    private void setupLocationChecker() {
-
-        startText.addTextChangedListener(new TextWatcher() {
-            private Timer startTime = new Timer();
-
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                startTime.cancel();
-                startTime = new Timer();
-                startTime.schedule(new TimerTask() {
-                        @Override
-                        public void run() {
-                            resolveStartLocation();
-                        }
-                },1000);
-            }
-        });
-
-        destText.addTextChangedListener(new TextWatcher() {
-            private Timer destTime = new Timer();
-
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                destTime.cancel();
-                destTime = new Timer();
-                destTime.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        resolveDestLocation();
-                    }
-                },1000);
-            }
-        });
-    }
-
-    private void resolveStartLocation() {
-        final LocationAPI service = OpiaService.createLocationClient();
-
-        subscription = service.getSuggest(startText.getText().toString(), "0", 5)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Suggested>() {
-                    @Override
-                    public void onCompleted() {
-                        subscription.unsubscribe();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toaster.toast(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(Suggested response) {
-                        String desc = response.getSuggestions().get(0).getDescription();
-                        String id = response.getSuggestions().get(0).getId();
-                        Toaster.toast(desc);
-                        startVal.setDescription(desc);
-                        startVal.setId(id);
-                    }
-                });
-    }
-
-    private void resolveDestLocation() {
-        final LocationAPI service = OpiaService.createLocationClient();
-
-        subscription = service.getSuggest(destText.getText().toString(), "0", 5)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Suggested>() {
-                    @Override
-                    public void onCompleted() {
-                        subscription.unsubscribe();
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toaster.toast(e.getMessage());
-                    }
-
-                    @Override
-                    public void onNext(Suggested response) {
-                        String desc = response.getSuggestions().get(0).getDescription();
-                        String id = response.getSuggestions().get(0).getId();
-                        Toaster.toast(desc);
-                        destVal.setDescription(desc);
-                        destVal.setId(id);
-                    }
-                });
     }
 
     private void setupSpinnerSelection(View v) {
@@ -272,19 +171,24 @@ public class PlannerFragment extends Fragment {
     }
 
     private boolean checkLocations() {
-        String startDesc = startVal.getDescription();
-        String startCheck = startText.getText().toString();
-        String destDesc = destVal.getDescription();
-        String destCheck = destText.getText().toString();
-        boolean result = true;
+        try {
+            String startDesc = startVal.getDescription();
+            String startCheck = startText.getText();
+            String destDesc = destVal.getDescription();
+            String destCheck = destText.getText();
+            boolean result = true;
 
-        if (!startDesc.equals(startCheck)) {
-            result = false;
+            if (!startDesc.equals(startCheck)) {
+                result = false;
+            }
+            if (!destDesc.equals(destCheck)) {
+                result = false;
+            }
+            return result;
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+            return false;
         }
-        if (!destDesc.equals(destCheck)) {
-            result = false;
-        }
-        return result;
     }
 
     private int findModes(CheckBox bus, CheckBox train, CheckBox ferry, CheckBox tram) {

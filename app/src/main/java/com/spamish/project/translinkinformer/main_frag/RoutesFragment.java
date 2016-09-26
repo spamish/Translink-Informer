@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.spamish.project.translinkinformer.R;
 
 public class RoutesFragment extends Fragment {
+    private static final String TAG = "RoutesFragment";
 
     public RoutesFragment() {
         // Required empty public constructor

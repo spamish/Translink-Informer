@@ -7,7 +7,6 @@ import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import xdroid.toaster.Toaster;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,25 +15,26 @@ import android.text.TextWatcher;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.spamish.project.translinkinformer.R;
-import com.spamish.project.translinkinformer.misc.LocationAdaptor;
+import com.spamish.project.translinkinformer.misc.SuggestAdapter;
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
 import com.spamish.project.translinkinformer.opia.LocationAPI;
 import com.spamish.project.translinkinformer.opia.OpiaService;
 
 public class MapFragment extends Fragment {
-    Suggestion startVal;
+    private static final String TAG = "MapFragment";
+    Suggestion locVal;
     Subscription subscription;
-    AutoCompleteTextView startText;
+    AutoCompleteTextView locText;
+    ArrayAdapter<Suggestion> locAdapter;
     TextView dataDump;
-
-    private static final String[] DATA = new String[] {
-            "Big Tits", "Lesbian", "MILF", "Teen", "Toys"
-    };
 
     public MapFragment() {
         // Required empty public constructor
@@ -49,21 +49,33 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View viewer = inflater.inflate(R.layout.fragment_map, container, false);
-        startText = (AutoCompleteTextView) viewer.findViewById(R.id.in_loc);
-        dataDump = (TextView) viewer.findViewById(R.id.data_dump);
-        startText.setAdapter(new LocationAdaptor(getActivity()));
-
+        locText = (AutoCompleteTextView) viewer.findViewById(R.id.in_loc);
         setupLocationChecker();
+        Suggestion itemData = new Suggestion();
+        Suggestion[] suggItemData = new Suggestion[1];
+        suggItemData[0] = itemData;
+        locAdapter = new SuggestAdapter(getActivity(), R.layout.list_locations, R.id.textViewItem, suggItemData);
+        locText.setAdapter(locAdapter);
 
-        startVal = new Suggestion(null, null, 0);
+        dataDump = (TextView) viewer.findViewById(R.id.data_dump);
+        locVal = new Suggestion(null, null, 0);
         return viewer;
     }
 
     private void setupLocationChecker() {
 
-        startText.addTextChangedListener(new TextWatcher() {
+        locText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                RelativeLayout relLay = (RelativeLayout) view;
+                TextView textView = (TextView) relLay.getChildAt(0);
+                locVal = locAdapter.getItem(position);
+                locText.setText(textView.getText().toString());
+                dataDump.setText(locVal.getDescription() + "\n" + locVal.getId());
+            }
+        });
+        locText.addTextChangedListener(new TextWatcher() {
             private Timer startTime = new Timer();
-
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
             @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
@@ -84,30 +96,29 @@ public class MapFragment extends Fragment {
     private void resolveStartLocation() {
         final LocationAPI service = OpiaService.createLocationClient();
 
-        subscription = service.getSuggest(startText.getText().toString(), "0", 5)
+        subscription = service.getSuggest(locText.getText().toString(), "0", 5)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Suggested>() {
-                    @Override
-                    public void onCompleted() {
+                    @Override public void onCompleted() {
                         subscription.unsubscribe();
                     }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Toaster.toast(e.getMessage());
+                    @Override public void onError(Throwable e) {
+                        dataDump.setText(e.getMessage());
                     }
 
                     @Override
                     public void onNext(Suggested response) {
                         int siz = response.getSuggestions().size();
-                        StringBuilder text = new StringBuilder();
+                        Suggestion[] result = new Suggestion[siz];
+                        locAdapter.notifyDataSetChanged();
 
                         for (int i = 0; i < siz; i++) {
-                            Suggestion result = response.getSuggestions().get(i);
-                            text.append(result.getDescription() + "\n" + result.getId() + "\n");
+                            result[i] = response.getSuggestions().get(i);
                         }
-                        dataDump.setText(text.toString());
+
+                        locAdapter = new SuggestAdapter(getActivity(), R.layout.list_locations, R.id.textViewItem, result);
+                        locText.setAdapter(locAdapter);
                     }
                 });
     }

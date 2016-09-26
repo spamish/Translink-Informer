@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import com.spamish.project.translinkinformer.R;
 
 public class TimetablesFragment extends Fragment {
+    private static final String TAG = "TimetablesFragment";
 
     public TimetablesFragment() {
         // Required empty public constructor
