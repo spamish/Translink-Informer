@@ -1,4 +1,4 @@
-package com.spamish.project.translinkinformer.main_frag;
+package com.spamish.project.translinkinformer.frag_main;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -25,11 +25,10 @@ import com.spamish.project.translinkinformer.R;
 import com.spamish.project.translinkinformer.misc.SuggestAdapter;
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.opia.LocationAPI;
+import com.spamish.project.translinkinformer.opia.TranslinkAPI;
 import com.spamish.project.translinkinformer.opia.OpiaService;
 
 public class MapFragment extends Fragment {
-    private static final String TAG = "MapFragment";
     Suggestion locVal;
     Subscription subscription;
     AutoCompleteTextView locText;
@@ -94,7 +93,7 @@ public class MapFragment extends Fragment {
     }
 
     private void resolveStartLocation() {
-        final LocationAPI service = OpiaService.createLocationClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient();
 
         subscription = service.getSuggest(locText.getText().toString(), "0", 5)
                 .subscribeOn(Schedulers.io())

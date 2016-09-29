@@ -4,8 +4,6 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 
-import xdroid.toaster.Toaster;
-
 public class SettingsActivity extends AppCompatActivity {
 
     @Override

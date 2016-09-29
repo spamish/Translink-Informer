@@ -1,11 +1,19 @@
-package com.spamish.project.translinkinformer.main_frag;
+package com.spamish.project.translinkinformer.frag_main;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 
+import rx.Observer;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 import xdroid.toaster.Toaster;
 import android.app.DatePickerDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -17,17 +25,23 @@ import android.widget.DatePicker;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 
+import com.spamish.project.translinkinformer.JourneyActivity;
 import com.spamish.project.translinkinformer.R;
 import com.spamish.project.translinkinformer.misc.LocationTextInput;
+import com.spamish.project.translinkinformer.models.Journeys;
 import com.spamish.project.translinkinformer.models.Suggestion;
+import com.spamish.project.translinkinformer.opia.OpiaService;
+import com.spamish.project.translinkinformer.opia.TranslinkAPI;
+
+import org.parceler.Parcels;
 
 public class PlannerFragment extends Fragment {
-    private static final String TAG = "PlannerFragment";
-    int pickYear, pickMonth, pickDay, pickHour, pickMin;
+    Date dateTime;
     Suggestion startVal, destVal;
     Button time, date;
     LocationTextInput startText;
     LocationTextInput destText;
+    Subscription subscription;
 
     public PlannerFragment() {
         // Required empty public constructor
@@ -90,12 +104,8 @@ public class PlannerFragment extends Fragment {
         setupSpinnerSelection(viewer);
         setupTime();
 
-        startVal = new Suggestion();
-        startVal.setDescription("null");
-        startVal.setId("null");
-        destVal = new Suggestion();
-        destVal.setDescription("null");
-        destVal.setId("null");
+        startVal = new Suggestion(null, null, 0);
+        destVal = new Suggestion(null, null, 0);
 
         return viewer;
     }
@@ -111,36 +121,19 @@ public class PlannerFragment extends Fragment {
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View viewer) {
-                int modeVal = findModes(modeBus, modeTrain, modeFerry, modeTram);
-                int typeVal = findTypes(typeReg, typeExp, typeNig, typeSch);
-                int fareVal = findFares(fareStd, farePre, fareFre);
+                String modeVal = findModes(modeBus, modeTrain, modeFerry, modeTram);
+                String typeVal = findTypes(typeReg, typeExp, typeNig, typeSch);
+                String fareVal = findFares(fareStd, farePre, fareFre);
 
                 int walkVal = findWalking(walking);
-                int arrVal = arrival.getSelectedItemPosition();
-                int speeVal = speed.getSelectedItemPosition();
+                String arrVal = Integer.toString(arrival.getSelectedItemPosition());
+                String speeVal = Integer.toString(speed.getSelectedItemPosition());
 
                 startVal = startText.getValue();
                 destVal = destText.getValue();
 
                 if (checkLocations()) {
-                    //2016-09-09T13:05:00
-                    String dateTimeVal = pickYear + "-" +
-                            String.format("%02d", pickMonth + 1) + "-" +
-                            String.format("%02d", pickDay) + "T" +
-                            String.format("%02d", pickHour) + ":" +
-                            String.format("%02d", pickMin) + ":00";
-
-                    String text = "Start: " + startVal.getId() + "\n" +
-                                  "Dest: " + destVal.getId() + "\n" +
-                                  "Arrival: " + arrVal + "\n" +
-                                  "Time: " + dateTimeVal + "\n" +
-                                  "Vehicles: " + modeVal + "\n" +
-                                  "Speed: " + speeVal + "\n" +
-                                  "Walking: " + walkVal + "\n" +
-                                  "Service: " + typeVal + "\n" +
-                                  "Fare: " + fareVal;
-
-                    Toaster.toast(text);
+                    getTrips(startVal, destVal, arrVal, dateTime, modeVal, speeVal, walkVal, typeVal, fareVal);
                 } else {
                     Toaster.toast("Please check the locations entered.");
                 }
@@ -160,14 +153,15 @@ public class PlannerFragment extends Fragment {
 
     private void setupTime() {
         Calendar cal = Calendar.getInstance();
-        pickYear = cal.get(Calendar.YEAR);
-        pickMonth = cal.get(Calendar.MONTH);
-        pickDay = cal.get(Calendar.DATE);
-        pickHour = cal.get(Calendar.HOUR_OF_DAY);
-        pickMin = cal.get(Calendar.MINUTE);
+        dateTime = cal.getTime();
 
-        updateTime(pickHour, pickMin);
-        updateDate(pickYear, pickMonth, pickDay);
+        SimpleDateFormat format = new SimpleDateFormat("hh:mm a", Locale.US);
+        String text = format.format(dateTime);
+        time.setText(text);
+
+        format = new SimpleDateFormat("E dd MM yyyy", Locale.US);
+        text = format.format(dateTime);
+        date.setText(text);
     }
 
     private boolean checkLocations() {
@@ -191,7 +185,34 @@ public class PlannerFragment extends Fragment {
         }
     }
 
-    private int findModes(CheckBox bus, CheckBox train, CheckBox ferry, CheckBox tram) {
+    private void getTrips(Suggestion start, Suggestion dest, String arrival, Date dateTime,
+                          String mode, String speed, int walk, String type, String fare) {
+
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
+        final TranslinkAPI service = OpiaService.createTranslinkClient();
+
+        subscription = service.getPlan(start.getId(), dest.getId(), arrival, format.format(dateTime),
+                mode, speed, walk, type, fare)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Journeys>() {
+                    @Override public void onCompleted() {
+                        subscription.unsubscribe();
+                    }
+                    @Override public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(Journeys response) {
+                        Intent intent = new Intent(getActivity(), JourneyActivity.class);
+                        intent.putExtra("journeys", Parcels.wrap(response));
+                        startActivity(intent);
+                    }
+                });
+    }
+
+    private String findModes(CheckBox bus, CheckBox train, CheckBox ferry, CheckBox tram) {
         int value = 16;
 
         if (bus.isChecked()) {
@@ -207,10 +228,10 @@ public class PlannerFragment extends Fragment {
             value += 32;
         }
 
-        return value;
+        return Integer.toString(value);
     }
 
-    private int findTypes(CheckBox regular, CheckBox express, CheckBox nightlink, CheckBox school) {
+    private String findTypes(CheckBox regular, CheckBox express, CheckBox nightlink, CheckBox school) {
         int value = 0;
 
         if (regular.isChecked()) {
@@ -226,10 +247,10 @@ public class PlannerFragment extends Fragment {
             value += 8;
         }
 
-        return value;
+        return Integer.toString(value);
     }
 
-    private int findFares(CheckBox standard, CheckBox prepaid, CheckBox free) {
+    private String findFares(CheckBox standard, CheckBox prepaid, CheckBox free) {
         int value = 0;
 
         if (standard.isChecked()) {
@@ -242,7 +263,7 @@ public class PlannerFragment extends Fragment {
             value += 1;
         }
 
-        return value;
+        return Integer.toString(value);
     }
 
     private int findWalking(Spinner w) {
@@ -267,11 +288,26 @@ public class PlannerFragment extends Fragment {
     }
 
     public Dialog createDialog(int id) {
+        SimpleDateFormat format;
+        int year, month, date, hour, min;
+
         switch (id) {
             case 0:
-                return new DatePickerDialog(getActivity(), dateListener, pickYear, pickMonth, pickDay);
+                format = new SimpleDateFormat("yyyy", Locale.US);
+                year = Integer.parseInt(format.format(dateTime));
+                format = new SimpleDateFormat("MM", Locale.US);
+                month = Integer.parseInt(format.format(dateTime));
+                format = new SimpleDateFormat("dd", Locale.US);
+                date = Integer.parseInt(format.format(dateTime));
+
+                return new DatePickerDialog(getActivity(), dateListener, year, month, date);
             case 1:
-                return new TimePickerDialog(getActivity(), timeListener, pickHour, pickMin, false);
+                format = new SimpleDateFormat("HH", Locale.US);
+                hour = Integer.parseInt(format.format(dateTime));
+                format = new SimpleDateFormat("mm", Locale.US);
+                min = Integer.parseInt(format.format(dateTime));
+
+                return new TimePickerDialog(getActivity(), timeListener, hour, min, false);
         }
         return null;
     }
@@ -280,88 +316,51 @@ public class PlannerFragment extends Fragment {
             = new DatePickerDialog.OnDateSetListener() {
         @Override
         public void onDateSet(DatePicker viewDate, int y, int m, int d) {
-            updateDate(y, m, d);
+            SimpleDateFormat format = new SimpleDateFormat("HH", Locale.US);
+            int h = Integer.parseInt(format.format(dateTime));
+            format = new SimpleDateFormat("mm", Locale.US);
+            int k = Integer.parseInt(format.format(dateTime));
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, y);
+            cal.set(Calendar.MONTH, m);
+            cal.set(Calendar.DATE, d);
+            cal.set(Calendar.HOUR_OF_DAY, h);
+            cal.set(Calendar.MINUTE, k);
+            dateTime = cal.getTime();
+
+            format = new SimpleDateFormat("E dd MM yyyy", Locale.US);
+            String text = format.format(dateTime);
+
+            date.setText(text);
         }
     };
-
-    private void updateDate(int year, int month, int day) {
-        pickYear = year;
-        pickMonth = month;
-        pickDay = day;
-
-        String name = "", suffix = DomSuffix(day);
-        switch (month) {
-            case 0: name = "Jan"; break;
-            case 1: name = "Feb"; break;
-            case 2: name = "Mar"; break;
-            case 3: name = "Apr"; break;
-            case 4: name = "May"; break;
-            case 5: name = "Jun"; break;
-            case 6: name = "Jul"; break;
-            case 7: name = "Aug"; break;
-            case 8: name = "Sep"; break;
-            case 9: name = "Oct"; break;
-            case 10: name = "Nov"; break;
-            case 11: name = "Dec"; break;
-        }
-
-        String dateString = new StringBuilder()
-                .append(day)
-                .append(suffix)
-                .append(" ")
-                .append(name)
-                .append(" ")
-                .append(year)
-                .toString();
-        date.setText(dateString);
-    }
-
-    private String DomSuffix(int day) {
-        if (day >= 11 && day <= 13) {
-            return "th";
-        }
-        switch (day % 10) {
-            case 1:  return "st";
-            case 2:  return "nd";
-            case 3:  return "rd";
-            default: return "th";
-        }
-    }
 
     private TimePickerDialog.OnTimeSetListener timeListener
             = new TimePickerDialog.OnTimeSetListener() {
         @Override
-        public void onTimeSet(TimePicker viewTime, int h, int m) {
-            updateTime(h, m);
+        public void onTimeSet(TimePicker viewTime, int h, int k) {
+            SimpleDateFormat format = new SimpleDateFormat("yyy", Locale.US);
+            int y = Integer.parseInt(format.format(dateTime));
+            format = new SimpleDateFormat("MM", Locale.US);
+            int m = Integer.parseInt(format.format(dateTime));
+            format = new SimpleDateFormat("dd", Locale.US);
+            int d = Integer.parseInt(format.format(dateTime));
+
+            Calendar cal = Calendar.getInstance();
+            cal.set(Calendar.YEAR, y);
+            cal.set(Calendar.MONTH, m);
+            cal.set(Calendar.DATE, d);
+            cal.set(Calendar.HOUR_OF_DAY, h);
+            cal.set(Calendar.MINUTE, k);
+            dateTime = cal.getTime();
+
+            format = new SimpleDateFormat("hh:mm a", Locale.US);
+            String text = format.format(dateTime);
+
+            time.setText(text);
         }
     };
-
-    private void updateTime(int hours, int minutes) {
-        pickHour = hours;
-        pickMin = minutes;
-
-        String postfix, prefix = ":";
-        if (hours > 11) {
-            postfix = " pm";
-            hours = hours - 12;
-        } else {
-            postfix = " am";
-        }
-        if (hours == 0) {
-            hours = 12;
-        }
-        if (minutes < 10) {
-            prefix = ":0";
-        }
-
-        String timeString = new StringBuilder()
-                .append(hours)
-                .append(prefix)
-                .append(minutes)
-                .append(postfix)
-                .toString();
-        time.setText(timeString);
-    }
 
     @Override
     public void onDetach() {

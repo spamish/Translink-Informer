@@ -1,4 +1,4 @@
-package com.spamish.project.translinkinformer.main_frag;
+package com.spamish.project.translinkinformer.frag_main;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -8,10 +8,9 @@ import android.view.ViewGroup;
 
 import com.spamish.project.translinkinformer.R;
 
-public class BookmarksFragment extends Fragment {
-    private static final String TAG = "BookmarksFragment";
+public class RoutesFragment extends Fragment {
 
-    public BookmarksFragment() {
+    public RoutesFragment() {
         // Required empty public constructor
     }
 
@@ -24,7 +23,7 @@ public class BookmarksFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_bookmarks, container, false);
+        return inflater.inflate(R.layout.fragment_routes, container, false);
     }
 
     @Override

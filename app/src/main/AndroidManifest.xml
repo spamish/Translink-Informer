@@ -37,13 +37,24 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
-        <activity android:name=".FeedbackActivity"
+        <activity
+            android:name=".FeedbackActivity"
             android:label="@string/title_activity_feedback"
             android:parentActivityName=".LandingActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
+        <activity
+            android:name=".JourneyActivity"
+            android:label="@string/title_activity_journey"
+            android:parentActivityName=".LandingActivity">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".LandingActivity" />
+        </activity>
+        <activity android:name=".StopActivity" />
+        <activity android:name=".ServiceActivity"></activity>
     </application>
 
 </manifest>

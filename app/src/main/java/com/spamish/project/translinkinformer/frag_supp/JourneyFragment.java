@@ -1,4 +1,4 @@
-package com.spamish.project.translinkinformer.main_frag;
+package com.spamish.project.translinkinformer.frag_supp;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -6,11 +6,15 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.spamish.project.translinkinformer.JourneyActivity;
 import com.spamish.project.translinkinformer.R;
+import com.spamish.project.translinkinformer.models.TravelOptions;
 
-public class TripsFragment extends Fragment {
+import xdroid.toaster.Toaster;
 
-    public TripsFragment() {
+public class JourneyFragment extends Fragment {
+
+    public JourneyFragment() {
         // Required empty public constructor
     }
 
@@ -23,7 +27,15 @@ public class TripsFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trips, container, false);
+        View viewer = inflater.inflate(R.layout.fragment_journey, container, false);
+
+        JourneyActivity activity = (JourneyActivity) getActivity();
+        TravelOptions data;
+
+        data = activity.getJourneys();
+        Toaster.toast(data.toString());
+
+        return viewer;
     }
 
     @Override

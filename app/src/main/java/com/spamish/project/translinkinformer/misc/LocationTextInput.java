@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.opia.LocationAPI;
+import com.spamish.project.translinkinformer.opia.TranslinkAPI;
 import com.spamish.project.translinkinformer.opia.OpiaService;
 
 import java.util.Timer;
@@ -22,7 +22,6 @@ import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import xdroid.toaster.Toaster;
 
 public class LocationTextInput {
     AutoCompleteTextView text;
@@ -72,7 +71,7 @@ public class LocationTextInput {
     }
 
     private void resolveStartLocation(final int list, final int view) {
-        final LocationAPI service = OpiaService.createLocationClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient();
 
         subscription = service.getSuggest(text.getText().toString(), "0", 5)
                 .subscribeOn(Schedulers.io())

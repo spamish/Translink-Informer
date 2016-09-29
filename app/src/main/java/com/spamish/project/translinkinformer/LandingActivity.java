@@ -16,12 +16,12 @@ import android.view.MenuItem;
 
 import xdroid.toaster.Toaster;
 
-import com.spamish.project.translinkinformer.main_frag.BookmarksFragment;
-import com.spamish.project.translinkinformer.main_frag.MapFragment;
-import com.spamish.project.translinkinformer.main_frag.PlannerFragment;
-import com.spamish.project.translinkinformer.main_frag.RoutesFragment;
-import com.spamish.project.translinkinformer.main_frag.TimetablesFragment;
-import com.spamish.project.translinkinformer.main_frag.TripsFragment;
+import com.spamish.project.translinkinformer.frag_main.BookmarksFragment;
+import com.spamish.project.translinkinformer.frag_main.MapFragment;
+import com.spamish.project.translinkinformer.frag_main.PlannerFragment;
+import com.spamish.project.translinkinformer.frag_main.RoutesFragment;
+import com.spamish.project.translinkinformer.frag_main.TimetablesFragment;
+import com.spamish.project.translinkinformer.frag_main.TripsFragment;
 import com.spamish.project.translinkinformer.net_tools.Connectivity;
 
 public class LandingActivity extends AppCompatActivity {

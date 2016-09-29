@@ -2,6 +2,9 @@ package com.spamish.project.translinkinformer.opia;
 
 import android.util.Base64;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+
 import java.io.IOException;
 
 import okhttp3.Interceptor;
@@ -19,7 +22,7 @@ public class OpiaService {
     public OpiaService(){
     }
 
-    public static LocationAPI createLocationClient() {
+    public static TranslinkAPI createTranslinkClient() {
 
         String credentials = "samuel.janetzki:G%ImX=)?QtA7";
         final String basic =
@@ -43,12 +46,15 @@ public class OpiaService {
         builder.interceptors().add(logger);
         OkHttpClient client = builder.build();
 
+        Gson gson = new GsonBuilder()
+                .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+                .create();
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(LOCATION_URL)
-                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
                 .client(client)
                 .build();
-        return retrofit.create(LocationAPI.class);
+        return retrofit.create(TranslinkAPI.class);
     }
 }
