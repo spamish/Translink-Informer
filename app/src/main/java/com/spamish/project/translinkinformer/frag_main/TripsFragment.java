@@ -48,12 +48,6 @@ public class TripsFragment extends Fragment {
         View viewer = inflater.inflate(R.layout.fragment_trips, container, false);
 
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, 2016);
-        cal.set(Calendar.MONTH, 8);
-        cal.set(Calendar.DATE, 28);
-        cal.set(Calendar.HOUR_OF_DAY, 13);
-        cal.set(Calendar.MINUTE, 30);
-
         final Date dateTime = cal.getTime();
         final Suggestion start, dest;
 

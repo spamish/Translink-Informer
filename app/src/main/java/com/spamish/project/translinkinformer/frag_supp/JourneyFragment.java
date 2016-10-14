@@ -29,11 +29,10 @@ public class JourneyFragment extends Fragment {
         // Inflate the layout for this fragment
         View viewer = inflater.inflate(R.layout.fragment_journey, container, false);
 
-        JourneyActivity activity = (JourneyActivity) getActivity();
-        TravelOptions data;
+        //JourneyActivity activity = (JourneyActivity) getActivity();
+        //TravelOptions data;
 
-        data = activity.getJourneys();
-        Toaster.toast(data.toString());
+        //data = activity.getJourneys();
 
         return viewer;
     }
