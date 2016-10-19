@@ -25,8 +25,8 @@ import com.spamish.project.translinkinformer.R;
 import com.spamish.project.translinkinformer.misc.SuggestAdapter;
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.opia.TranslinkAPI;
-import com.spamish.project.translinkinformer.opia.OpiaService;
+import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
+import com.spamish.project.translinkinformer.api_tools.OpiaService;
 
 public class MapFragment extends Fragment {
     Suggestion locVal;

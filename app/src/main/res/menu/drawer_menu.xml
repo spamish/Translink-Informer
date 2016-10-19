@@ -5,15 +5,6 @@
         <item
             android:id="@+id/nav_trips"
             android:title="@string/drawer_nav_trips" />
-        <!--android:icon="@drawable/nav_trips"-->
-        <item
-            android:id="@+id/nav_routes"
-            android:title="@string/drawer_nav_routes" />
-        <!--android:icon="@drawable/nav_routes"-->
-        <item
-            android:id="@+id/nav_bookmarks"
-            android:title="@string/drawer_nav_bookmarks" />
-        <!--android:icon="@drawable/nav_bookmarks"-->
     </group>
 
     <item android:title="@string/drawer_title_translink">
@@ -22,15 +13,6 @@
                 <item
                     android:id="@+id/nav_planner"
                     android:title="@string/drawer_nav_planner" />
-                <!--android:icon="@drawable/nav_planner"-->
-                <item
-                    android:id="@+id/nav_timetables"
-                    android:title="@string/drawer_nav_timetables"/>
-                <!--android:icon="@drawable/nav_timetables"-->
-                <item
-                    android:id="@+id/nav_map"
-                    android:title="@string/drawer_nav_map" />
-                <!--android:icon="@drawable/nav_map"-->
             </group>
         </menu>
     </item>
@@ -41,15 +23,6 @@
                 <item
                     android:id="@+id/nav_settings"
                     android:title="@string/drawer_nav_settings" />
-                <!--android:icon="@drawable/nav_settings"-->
-                <item
-                    android:id="@+id/nav_feedback"
-                    android:title="@string/drawer_nav_feedback" />
-                <!--android:icon="@drawable/nav_feedback"-->
-                <item
-                    android:id="@+id/nav_help"
-                    android:title="@string/drawer_nav_help" />
-                <!--android:icon="@drawable/nav_help"-->
             </group>
         </menu>
     </item>

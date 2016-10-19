@@ -12,8 +12,8 @@ import android.widget.TextView;
 
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.opia.TranslinkAPI;
-import com.spamish.project.translinkinformer.opia.OpiaService;
+import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
+import com.spamish.project.translinkinformer.api_tools.OpiaService;
 
 import java.util.Timer;
 import java.util.TimerTask;

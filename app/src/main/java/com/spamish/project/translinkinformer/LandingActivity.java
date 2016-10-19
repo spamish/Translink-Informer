@@ -2,6 +2,7 @@ package com.spamish.project.translinkinformer;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -30,11 +31,22 @@ public class LandingActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private int menuSel;
     private NavigationView navDrawer;
+    Boolean stat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_landing);
+
+        SharedPreferences settings = this.getSharedPreferences("settings", 0);
+        String status = settings.getString("status", "false");
+
+        if (!status.equals("false")) {
+            stat = true;
+        } else {
+            stat = false;
+        }
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -47,9 +59,14 @@ public class LandingActivity extends AppCompatActivity {
         setupDrawerContent(navDrawer);
 
         if (savedInstanceState == null) {
-            menuSel = R.id.nav_trips;
             FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-            transaction.add(R.id.fragment_content, new TripsFragment());
+
+            if (stat) {
+                transaction.add(R.id.fragment_content, new TripsFragment());
+            } else {
+                transaction.add(R.id.fragment_content, new PlannerFragment());
+            }
+
             transaction.commit();
         }
     }
@@ -85,59 +102,58 @@ public class LandingActivity extends AppCompatActivity {
                     transaction.replace(R.id.fragment_content, new TripsFragment());
                     transaction.commit();
                 }
-                break;
-            case R.id.nav_routes:
+            /**case R.id.nav_routes:
                 if (menuSel != R.id.nav_routes) {
                     menuSel = R.id.nav_routes;
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_content, new RoutesFragment());
                     transaction.commit();
                 }
-                break;
-            case R.id.nav_bookmarks:
+                break;*/
+            /**case R.id.nav_bookmarks:
                 if (menuSel != R.id.nav_bookmarks) {
                     menuSel = R.id.nav_bookmarks;
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_content, new BookmarksFragment());
                     transaction.commit();
                 }
-                break;
+                break;*/
             case R.id.nav_planner:
-                if (menuSel != R.id.nav_feedback) {
-                    menuSel = R.id.nav_feedback;
+                if (menuSel != R.id.nav_planner) {
+                    menuSel = R.id.nav_planner;
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_content, new PlannerFragment());
                     transaction.commit();
                 }
                 break;
-            case R.id.nav_timetables:
+            /**case R.id.nav_timetables:
                 if (menuSel != R.id.nav_timetables) {
                     menuSel = R.id.nav_timetables;
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_content, new TimetablesFragment());
                     transaction.commit();
                 }
-                break;
-            case R.id.nav_map:
+                break;*/
+            /**case R.id.nav_map:
                 if (menuSel != R.id.nav_map) {
                     menuSel = R.id.nav_map;
                     transaction = getSupportFragmentManager().beginTransaction();
                     transaction.replace(R.id.fragment_content, new MapFragment());
                     transaction.commit();
                 }
-                break;
+                break;*/
             case R.id.nav_settings:
                 intent = new Intent(this, SettingsActivity.class);
                 startActivity(intent);
                 break;
-            case R.id.nav_feedback:
+            /**case R.id.nav_feedback:
                 intent = new Intent(this, FeedbackActivity.class);
                 startActivity(intent);
-                break;
-            case R.id.nav_help:
+                break;*/
+            /**case R.id.nav_help:
                 intent = new Intent(this, HelpActivity.class);
                 startActivity(intent);
-                break;
+                break;*/
             default:
                 break;
         }
@@ -157,10 +173,8 @@ public class LandingActivity extends AppCompatActivity {
         Connectivity connected = new Connectivity();
         ConnectivityManager conMan = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (connected.isNetworkAvailable(conMan)) {
-            Toaster.toast("Network Passed!");
-        } else {
-            Toaster.toast("Network Failed!");
+        if (!connected.isNetworkAvailable(conMan)) {
+            Toaster.toast("Please check your internet connection");
         }
     }
 
