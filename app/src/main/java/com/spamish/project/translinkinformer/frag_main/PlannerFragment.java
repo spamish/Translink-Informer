@@ -98,9 +98,9 @@ public class PlannerFragment extends Fragment {
                 typeReg, typeExp, typeNig, typeSch, fareStd,
                 farePre, fareFre, walking, arrival, speed);
 
-        startText = new LocationTextInput(getActivity(), viewer,
+        startText = new LocationTextInput(getActivity(), viewer, null,
                 R.id.in_start, R.layout.list_loc_start, R.id.startTextViewItem);
-        destText = new LocationTextInput(getActivity(), viewer,
+        destText = new LocationTextInput(getActivity(), viewer, null,
                 R.id.in_dest, R.layout.list_loc_dest, R.id.destTextViewItem);
 
         setupSpinnerSelection(viewer);

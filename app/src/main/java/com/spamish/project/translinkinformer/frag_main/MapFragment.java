@@ -1,39 +1,37 @@
 package com.spamish.project.translinkinformer.frag_main;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import android.os.Bundle;
+import android.support.v4.app.Fragment;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.AutoCompleteTextView;
+import android.widget.TextView;
+
+import com.spamish.project.translinkinformer.R;
+import com.spamish.project.translinkinformer.api_tools.OpiaService;
+import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
+import com.spamish.project.translinkinformer.misc.LocationTextInput;
+import com.spamish.project.translinkinformer.models.Nearby;
+import com.spamish.project.translinkinformer.models.NearbyStop;
+import com.spamish.project.translinkinformer.models.Stop;
+import com.spamish.project.translinkinformer.models.Stops;
+import com.spamish.project.translinkinformer.models.Suggestion;
+
+import java.util.List;
 
 import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
-import android.os.Bundle;
-import android.support.v4.app.Fragment;
-import android.text.Editable;
-import android.text.TextWatcher;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AutoCompleteTextView;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
-
-import com.spamish.project.translinkinformer.R;
-import com.spamish.project.translinkinformer.misc.SuggestAdapter;
-import com.spamish.project.translinkinformer.models.Suggested;
-import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
-import com.spamish.project.translinkinformer.api_tools.OpiaService;
+import xdroid.toaster.Toaster;
 
 public class MapFragment extends Fragment {
-    Suggestion locVal;
-    Subscription subscription;
-    AutoCompleteTextView locText;
-    ArrayAdapter<Suggestion> locAdapter;
+    LocationTextInput locText;
     TextView dataDump;
+    Subscription nearbySubs, stopsSubs;
+    List<NearbyStop> nearby;
 
     public MapFragment() {
         // Required empty public constructor
@@ -48,76 +46,74 @@ public class MapFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View viewer = inflater.inflate(R.layout.fragment_map, container, false);
-        locText = (AutoCompleteTextView) viewer.findViewById(R.id.in_loc);
-        setupLocationChecker();
-        Suggestion itemData = new Suggestion();
-        Suggestion[] suggItemData = new Suggestion[1];
-        suggItemData[0] = itemData;
-        locAdapter = new SuggestAdapter(getActivity(), R.layout.list_locations, R.id.textViewItem, suggItemData);
-        locText.setAdapter(locAdapter);
 
         dataDump = (TextView) viewer.findViewById(R.id.data_dump);
-        locVal = new Suggestion(null, null, 0);
+        locText = new LocationTextInput(getActivity(), viewer, this,
+                R.id.in_loc, R.layout.list_locations, R.id.locTextViewItem);
+
         return viewer;
     }
 
-    private void setupLocationChecker() {
-
-        locText.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                RelativeLayout relLay = (RelativeLayout) view;
-                TextView textView = (TextView) relLay.getChildAt(0);
-                locVal = locAdapter.getItem(position);
-                locText.setText(textView.getText().toString());
-                dataDump.setText(locVal.getDescription() + "\n" + locVal.getId());
-            }
-        });
-        locText.addTextChangedListener(new TextWatcher() {
-            private Timer startTime = new Timer();
-            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                startTime.cancel();
-                startTime = new Timer();
-                startTime.schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        resolveStartLocation();
-                    }
-                },1000);
-            }
-        });
-    }
-
-    private void resolveStartLocation() {
+    public void getStopsNearby(Suggestion selected) {
         final TranslinkAPI service = OpiaService.createTranslinkClient();
+        Toaster.toast("Got location");
 
-        subscription = service.getSuggest(locText.getText().toString(), "0", 5)
+        nearbySubs = service.getNearby(selected.getId(), 500, true, 10)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(new Observer<Suggested>() {
+                .subscribe(new Observer<Nearby>() {
                     @Override public void onCompleted() {
-                        subscription.unsubscribe();
+                        nearbySubs.unsubscribe();
                     }
                     @Override public void onError(Throwable e) {
-                        dataDump.setText(e.getMessage());
+                        e.printStackTrace();
                     }
 
                     @Override
-                    public void onNext(Suggested response) {
-                        int siz = response.getSuggestions().size();
-                        Suggestion[] result = new Suggestion[siz];
-                        locAdapter.notifyDataSetChanged();
+                    public void onNext(Nearby response) {
+                        nearby = response.getNearbyStops();
+                        resolveStops();
+                    }
+                });
+    }
 
-                        for (int i = 0; i < siz; i++) {
-                            result[i] = response.getSuggestions().get(i);
+    private void resolveStops() {
+        String codes = "";
+        Toaster.toast("Got stops");
+
+        for (int i = 0; i < nearby.size(); i++) {
+            codes = codes + "," + nearby.get(i).getStopId();
+        }
+
+        codes = codes.substring(1);
+        Toaster.toast(codes);
+        final TranslinkAPI service = OpiaService.createTranslinkClient();
+
+        stopsSubs = service.getStopList(codes)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<Stops>() {
+                    @Override public void onCompleted() { stopsSubs.unsubscribe();
+                    }
+                    @Override public void onError(Throwable e) {
+                        e.printStackTrace();
+                    }
+
+                    @Override
+                    public void onNext(Stops response) {
+                        List<Stop> stops = response.getStops();
+                        String data = "";
+                        Toaster.toast("Got stop");
+
+                        for (int i = 0; i < nearby.size(); i++) {
+                            data = data + stops.get(i).getDescription() + "\n" +
+                                    nearby.get(i).getDistance().getDistanceM() + "m\n" +
+                                    nearby.get(i).getStopId() + " " + stops.get(i).getStopId() +
+                                    "\n" + stops.get(i).getSuburb() + ", zone " +
+                                    stops.get(i).getZone() + "\n\n";
                         }
 
-                        locAdapter = new SuggestAdapter(getActivity(), R.layout.list_locations, R.id.textViewItem, result);
-                        locText.setAdapter(locAdapter);
+                        dataDump.setText(data);
                     }
                 });
     }

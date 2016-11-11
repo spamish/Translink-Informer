@@ -13,75 +13,79 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <receiver android:name="com.spamish.project.translinkinformer.net_tools.TwitterReceiver">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
 
         <activity
             android:name=".LandingActivity"
             android:label="@string/title_activity_main"
             android:theme="@style/AppTheme.NoActionBar">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="t4jsample"
-                    android:scheme="oauth" />
-            </intent-filter>
         </activity>
+
         <activity
             android:name=".HelpActivity"
             android:label="@string/title_activity_help"
             android:parentActivityName=".LandingActivity">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
+
         <activity
             android:name=".SettingsActivity"
             android:label="@string/title_activity_settings"
             android:parentActivityName=".LandingActivity">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
+
         <activity
             android:name=".FeedbackActivity"
             android:label="@string/title_activity_feedback"
             android:parentActivityName=".LandingActivity">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
+
         <activity
             android:name=".JourneyActivity"
             android:label="@string/title_activity_journey"
             android:parentActivityName=".LandingActivity">
+
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".LandingActivity" />
         </activity>
+
         <activity android:name=".StopActivity" />
         <activity android:name=".ServiceActivity" />
 
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="31a65f6557b77ca1b19a948d319ec1ef8faa5450" />
-        />
+
         <receiver
             android:name=".net_tools.TwitterReceiver"
             android:enabled="true"
-            android:exported="true"></receiver>
+            android:exported="true">
+        </receiver>
+
+        <receiver
+            android:name=".net_tools.AlarmReceiver"
+            android:process=":remote" >
+        </receiver>
+
+        <service
+            android:name=".net_tools.CheckerService"
+            android:exported="false" />
     </application>
 
 </manifest>

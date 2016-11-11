@@ -4,17 +4,27 @@
     android:layout_height="match_parent"
     tools:context=".frag_main.TripsFragment">
 
-    <AutoCompleteTextView
-        android:id="@+id/in_loc"
-        android:hint="Location of Interest"
+    <android.support.design.widget.TextInputLayout
+        android:id="@+id/loc_search_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-    </AutoCompleteTextView>
+        <AutoCompleteTextView
+            android:id="@+id/in_loc"
+            android:maxLines="1"
+            android:hint="Starting location"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+        </AutoCompleteTextView>
+    </android.support.design.widget.TextInputLayout>
 
-    <TextView
-        android:id="@+id/data_dump"
-        android:layout_marginTop="100dp"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/data_dump"
+            android:layout_marginTop="100dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </ScrollView>
 </FrameLayout>

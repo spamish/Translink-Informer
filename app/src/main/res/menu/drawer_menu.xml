@@ -5,6 +5,12 @@
         <item
             android:id="@+id/nav_trips"
             android:title="@string/drawer_nav_trips" />
+        <item
+            android:id="@+id/nav_routes"
+            android:title="@string/drawer_nav_routes" />
+        <item
+            android:id="@+id/nav_bookmarks"
+            android:title="@string/drawer_nav_bookmarks" />
     </group>
 
     <item android:title="@string/drawer_title_translink">
@@ -13,6 +19,12 @@
                 <item
                     android:id="@+id/nav_planner"
                     android:title="@string/drawer_nav_planner" />
+                <item
+                    android:id="@+id/nav_timetables"
+                    android:title="@string/drawer_nav_timetables"/>
+                <item
+                    android:id="@+id/nav_map"
+                    android:title="@string/drawer_nav_map" />
             </group>
         </menu>
     </item>
@@ -23,6 +35,9 @@
                 <item
                     android:id="@+id/nav_settings"
                     android:title="@string/drawer_nav_settings" />
+                <item
+                    android:id="@+id/nav_help"
+                    android:title="@string/drawer_nav_help" />
             </group>
         </menu>
     </item>

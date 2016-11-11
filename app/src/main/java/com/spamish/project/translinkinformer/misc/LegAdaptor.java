@@ -108,16 +108,16 @@ public class LegAdaptor extends ArrayAdapter<Leg> {
         }
 
         switch (route.getVehicle()) {
-            case "2":
+            case 2:
                 mode = "bus";
                 break;
-            case "4":
+            case 4:
                 mode = "ferry";
                 break;
-            case "8":
+            case 8:
                 mode = "train";
                 break;
-            case "32":
+            case 32:
                 mode = "tram";
                 break;
         }

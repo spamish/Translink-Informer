@@ -86,6 +86,10 @@ public class JourneyFragment extends Fragment {
         ListView listView = (ListView) viewer.findViewById(R.id.list_view_legs);
         listView.setAdapter(adapter);
 
+        for (int i = 0; i < journeyLegs.size(); i++) {
+            journeyLegs.get(i).getPolyline();
+        }
+
         return viewer;
     }
 

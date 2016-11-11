@@ -4,9 +4,14 @@
     android:layout_height="match_parent"
     tools:context=".frag_main.TripsFragment">
 
-    <TextView
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="Hello Timetables Fragment" />
+        android:layout_height="wrap_content">
 
+        <TextView
+            android:id="@+id/timetable_dump"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:text="Hello Timetables Fragment" />
+    </ScrollView>
 </FrameLayout>

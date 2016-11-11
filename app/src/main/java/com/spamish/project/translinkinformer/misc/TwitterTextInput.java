@@ -1,6 +1,5 @@
 package com.spamish.project.translinkinformer.misc;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -11,11 +10,10 @@ import android.widget.AutoCompleteTextView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.spamish.project.translinkinformer.frag_main.MapFragment;
+import com.spamish.project.translinkinformer.api_tools.OpiaService;
+import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
 import com.spamish.project.translinkinformer.models.Suggested;
 import com.spamish.project.translinkinformer.models.Suggestion;
-import com.spamish.project.translinkinformer.api_tools.TranslinkAPI;
-import com.spamish.project.translinkinformer.api_tools.OpiaService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -24,22 +22,18 @@ import rx.Observer;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import xdroid.toaster.Toaster;
 
-public class LocationTextInput {
+public class TwitterTextInput {
     AutoCompleteTextView text;
     Suggestion value;
     ArrayAdapter<Suggestion> adapter;
     Subscription subscription;
     Context context;
     View viewer;
-    MapFragment listener;
 
-    public LocationTextInput(final Context context, View viewer, MapFragment list,
-                             int resInput, final int resList, final int resSel) {
+    public TwitterTextInput(Context context, View viewer, int resInput, final int resList, final int resSel) {
         this.context = context;
         this.viewer = viewer;
-        listener = list;
 
         Suggestion itemData = new Suggestion();
         Suggestion[] suggItemData = new Suggestion[1];
@@ -48,7 +42,6 @@ public class LocationTextInput {
 
         text = (AutoCompleteTextView) viewer.findViewById(resInput);
         text.setAdapter(adapter);
-
         text.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -56,13 +49,8 @@ public class LocationTextInput {
                 TextView textView = (TextView) relLay.getChildAt(0);
                 value = adapter.getItem(position);
                 text.setText(textView.getText().toString());
-
-                if (listener != null) {
-                    listener.getStopsNearby(value);
-                }
             }
         });
-
         text.addTextChangedListener(new TextWatcher() {
             private Timer timer = new Timer();
             @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -110,10 +98,6 @@ public class LocationTextInput {
                         text.setAdapter(adapter);
                     }
                 });
-    }
-
-    public AutoCompleteTextView getView() {
-        return text;
     }
 
     public Suggestion getValue() {
