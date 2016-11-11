@@ -68,7 +68,7 @@ public class JourneyActivity extends AppCompatActivity {
 
     public static class JourneyAdaptor extends FragmentPagerAdapter {
 
-        public JourneyAdaptor(FragmentManager fragmentManager) {
+        JourneyAdaptor(FragmentManager fragmentManager) {
             super(fragmentManager);
         }
 

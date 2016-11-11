@@ -52,14 +52,15 @@ public class CheckerService extends IntentService {
 
     @Override
     protected void onHandleIntent(Intent intent) {
-        TwitterAuthConfig authConfig = new TwitterAuthConfig(
+        TwitterAuthConfig consumer = new TwitterAuthConfig(
                 getResources().getString(R.string.consumer_key),
                 getResources().getString(R.string.consumer_sec)
         );
 
-        Fabric.with(this, new Twitter(authConfig));
-        TwitterSession session = Twitter.getInstance().core.getSessionManager().getActiveSession();
-        TwitterAuthConfig consumer = Twitter.getInstance().core.getAuthConfig();
+        Fabric.with(this, new Twitter(consumer));
+        TwitterSession session = Twitter.getInstance().core
+                .getSessionManager()
+                .getActiveSession();
 
         if (session != null) {
             pref = PreferenceManager.getDefaultSharedPreferences(this);

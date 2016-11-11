@@ -39,16 +39,16 @@ public class TwitterService {
         OkHttpClient.Builder builder = new OkHttpClient.Builder();
         builder.interceptors().add(interceptor);
         builder.interceptors().add(logger);
-        OkHttpClient client = builder.build();
 
         Gson gson = new GsonBuilder()
                 .setDateFormat("yyyy-MM-dd'T'HH:mm:ss")
                 .create();
+
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(TWITTER_URL)
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create())
-                .client(client)
+                .client(builder.build())
                 .build();
         return retrofit.create(PublicAPI.class);
     }

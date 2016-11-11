@@ -55,7 +55,7 @@ public class MapFragment extends Fragment {
     }
 
     public void getStopsNearby(Suggestion selected) {
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(getContext());
         Toaster.toast("Got location");
 
         nearbySubs = service.getNearby(selected.getId(), 500, true, 10)
@@ -87,7 +87,7 @@ public class MapFragment extends Fragment {
 
         codes = codes.substring(1);
         Toaster.toast(codes);
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(getContext());
 
         stopsSubs = service.getStopList(codes)
                 .subscribeOn(Schedulers.io())

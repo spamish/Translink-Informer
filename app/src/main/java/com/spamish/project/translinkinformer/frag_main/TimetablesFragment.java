@@ -48,7 +48,7 @@ public class TimetablesFragment extends Fragment {
         Date dateTime = cal.getTime();
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
 
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(getContext());
 
         subs = service.getRoutes(format.format(dateTime))
                 .subscribeOn(Schedulers.io())

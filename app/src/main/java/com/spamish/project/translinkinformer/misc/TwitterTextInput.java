@@ -71,7 +71,7 @@ public class TwitterTextInput {
     }
 
     private void resolveStartLocation(final int list, final int view) {
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(context);
 
         subscription = service.getSuggest(text.getText().toString(), "0", 5)
                 .subscribeOn(Schedulers.io())

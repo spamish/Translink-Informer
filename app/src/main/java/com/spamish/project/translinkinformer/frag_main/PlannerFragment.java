@@ -191,7 +191,7 @@ public class PlannerFragment extends Fragment {
                           String mode, String speed, int walk, String type, String fare) {
 
         SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.US);
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(getContext());
 
         tripSubs = service.getPlan(start.getId(), dest.getId(), arrival, format.format(dateTime),
                 mode, speed, walk, type, fare)
@@ -399,7 +399,7 @@ public class PlannerFragment extends Fragment {
 
         codes = codes.substring(1);
 
-        final TranslinkAPI service = OpiaService.createTranslinkClient();
+        final TranslinkAPI service = OpiaService.createTranslinkClient(getContext());
 
         stopsSubs = service.getStopList(codes)
                 .subscribeOn(Schedulers.io())
